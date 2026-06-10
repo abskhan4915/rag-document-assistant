@@ -10,6 +10,8 @@ Ask a question in a chat interface; the system retrieves the most relevant passa
 
 ## Architecture
 
+![RAG architecture diagram](docs/architecture.png)
+
 The system separates into two independent pipelines that communicate only through the vector store.
 
 **Ingestion pipeline** (`ingest.py`) - runs when documents change:
@@ -25,7 +27,11 @@ The system separates into two independent pipelines that communicate only throug
 4. Assemble a prompt: system instruction + retrieved context + question
 5. Generate a grounded answer with Azure OpenAI (gpt-4o-mini)
 
-Separating ingestion from serving is deliberate: the two have different lifecycles. Ingestion is expensive and runs only when source content changes; serving is lightweight and runs on every query. They never call each other — they share state through the vector store alone.
+Separating ingestion from serving is deliberate: the two have different lifecycles. Ingestion is expensive and runs only when source content changes; serving is lightweight and runs on every query. They never call each other — they share state through the vector store alone. 
+
+### Detailed system overview
+
+![Detailed RAG system overview](docs/overview.png)
 
 ## Tech stack
 
