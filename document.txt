@@ -1,0 +1,15 @@
+The UK Government AI Strategy outlines a comprehensive approach to artificial 
+intelligence adoption across public services. The strategy identifies three 
+core pillars: safety, innovation, and inclusion.
+
+Safety requirements mandate that all government AI systems undergo independent 
+audit before deployment. Systems that make decisions affecting individuals must 
+maintain human oversight and provide explainable outputs.
+
+The Home Office AI programme has delivered significant improvements in visa 
+processing times, reducing average decisions from 30 days to 8 days through 
+intelligent document verification and risk assessment models.
+
+Budget allocation for AI across government stands at £2.5 billion over the 
+next three years, with 40% dedicated to NHS applications, 30% to border 
+security, and 30% to administrative efficiency programmes.
