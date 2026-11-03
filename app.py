@@ -10,13 +10,12 @@ load_dotenv()
 chroma_client = chromadb.PersistentClient(path="./chroma_db")
 collection = chroma_client.get_or_create_collection(name="documents")
 
-client = AzureOpenAI(
-    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-    api_key=os.getenv("AZURE_OPENAI_KEY"),
-    api_version="2024-02-01"
-)
-
 st.title("Document Q&A — RAG Assistant")
+
+document_count = collection.count()
+if document_count == 0:
+    st.info("No documents are indexed yet. Run `python ingest.py`, then reload this page.")
+    st.stop()
 
 # Keep chat history across interactions
 if "messages" not in st.session_state:
@@ -37,10 +36,24 @@ if question:
         st.markdown(question)
 
     # RAG: retrieve relevant chunks
-    results = collection.query(query_texts=[question], n_results=2)
-    context = "\n\n".join(results["documents"][0])
+    results = collection.query(query_texts=[question], n_results=min(2, document_count))
+    document_batches = results.get("documents") or []
+    documents = (document_batches[0] or []) if document_batches else []
+    context = "\n\n".join(doc for doc in documents if doc and doc.strip())
+
+    if not context.strip():
+        answer = "I couldn't retrieve any document text to answer from. Check the indexed documents and try again."
+        st.session_state.messages.append({"role": "assistant", "content": answer})
+        with st.chat_message("assistant"):
+            st.markdown(answer)
+        st.stop()
 
     # RAG: grounded answer from LLM
+    client = AzureOpenAI(
+        azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+        api_key=os.getenv("AZURE_OPENAI_KEY"),
+        api_version="2024-02-01"
+    )
     response = client.chat.completions.create(
         model=os.getenv("AZURE_OPENAI_DEPLOYMENT"),
         messages=[
